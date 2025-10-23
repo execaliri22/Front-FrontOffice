@@ -1,0 +1,18 @@
+<div class="card" *ngIf="producto">
+  
+  <span *ngIf="producto.stock < 10 && producto.stock > 0" class="card-stock-low">¡Últimos!</span>
+  <span *ngIf="producto.stock === 0" class="card-stock-out">Agotado</span>
+
+  <div class="card-imagen-container">
+    <img [src]="producto.urlImagen" [alt]="producto.nombre" class="card-imagen">
+  </div>
+  
+  <div class="card-cuerpo">
+    <h5 class="card-titulo">{{ producto.nombre }}</h5>
+    <p class="card-precio">{{ producto.precio | currency:'$' }}</p>
+    
+    <button (click)="agregarAlCarrito()" class="btn-agregar" [disabled]="producto.stock === 0">
+      {{ producto.stock === 0 ? 'Agotado' : 'Añadir al Carrito' }}
+    </button>
+  </div>
+</div>

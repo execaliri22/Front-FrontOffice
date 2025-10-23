@@ -1,0 +1,17 @@
+/* Usamos los mismos estilos de la tabla del carrito */
+.historial-container table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--color-blanco);
+  box-shadow: var(--sombra-delicada);
+  border-radius: 8px;
+  overflow: hidden;
+}
+.historial-container th, .historial-container td {
+  padding: 1rem;
+  text-align: left;
+  border-bottom: var(--borde-delicado);
+}
+.historial-container th {
+  background-color: var(--color-fondo);
+}

@@ -1,0 +1,30 @@
+<h2>Mi Historial de Pedidos</h2>
+
+<div class="historial-container" *ngIf="pedidos$ | async as pedidos; else loading">
+  <div *ngIf="pedidos.length === 0">
+    <p>Aún no has realizado ningún pedido.</p>
+  </div>
+
+  <table *ngIf="pedidos.length > 0">
+    <thead>
+      <tr>
+        <th>ID Pedido</th>
+        <th>Fecha</th>
+        <th>Estado</th>
+        <th>Total</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let pedido of pedidos">
+        <td>#{{ pedido.idPedido }}</td>
+        <td>{{ pedido.fecha | date:'dd/MM/yyyy' }}</td>
+        <td>{{ pedido.estado }}</td>
+        <td>{{ pedido.total | currency:'$' }}</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<ng-template #loading>
+  <p>Cargando historial...</p>
+</ng-template>

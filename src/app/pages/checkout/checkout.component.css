@@ -1,0 +1,25 @@
+.checkout-container {
+  max-width: 500px;
+  margin: 0 auto;
+  padding: 2rem;
+  background: var(--color-blanco);
+  box-shadow: var(--sombra-delicada);
+  border-radius: 8px;
+}
+.form-group {
+  margin-bottom: 1rem;
+}
+.form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+}
+.form-group input {
+  width: 100%;
+  padding: 0.75rem;
+  border: var(--borde-delicado);
+  border-radius: 6px;
+  box-sizing: border-box;
+}
+.btn-primary {
+  width: 100%;
+}

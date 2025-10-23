@@ -1,1 +1,57 @@
-/* You can add global styles to this file, and also import other style files */
+/* Importamos una fuente limpia */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap');
+
+:root {
+  /* Paleta de colores "Delicada" */
+  --color-primario: #007bff;
+  --color-secundario: #6c757d;
+  --color-texto: #333;
+  --color-texto-suave: #666;
+  --color-fondo: #f8f9fa;
+  --color-blanco: #ffffff;
+  --borde-delicado: 1px solid #e9ecef;
+  --sombra-delicada: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+body {
+  font-family: 'Poppins', sans-serif;
+  background-color: var(--color-fondo);
+  color: var(--color-texto);
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 500;
+  margin-top: 0;
+}
+
+a {
+  text-decoration: none;
+  color: var(--color-primario);
+}
+
+.container {
+  max-width: 1300px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+/* Estilos de botones globales */
+.btn {
+  padding: 0.75rem 1.25rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  border: none;
+  transition: all 0.3s ease;
+}
+
+.btn-primary {
+  background-color: var(--color-primario);
+  color: var(--color-blanco);
+}
+.btn-primary:hover {
+  background-color: #0056b3;
+}

@@ -1,0 +1,78 @@
+.card {
+  background-color: var(--color-blanco);
+  border-radius: 12px;
+  box-shadow: var(--sombra-delicada);
+  overflow: hidden;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  position: relative; 
+}
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+}
+.card-stock-low, .card-stock-out {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background-color: #ffc107;
+  color: #333;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  z-index: 2;
+}
+.card-stock-out {
+  background-color: #dc3545;
+  color: white;
+}
+.card-imagen-container {
+  width: 100%;
+  height: 250px;
+  overflow: hidden;
+  background-color: #f4f4f4;
+}
+.card-imagen {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.card-cuerpo {
+  padding: 1.5rem;
+  text-align: center;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.card-titulo {
+  font-size: 1.1rem;
+  font-weight: 500;
+  margin: 0 0 0.5rem 0;
+  color: var(--color-texto);
+}
+.card-precio {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--color-primario);
+  margin: 0 0 1rem 0;
+}
+.btn-agregar {
+  background-color: var(--color-primario);
+  color: var(--color-blanco);
+  border: none;
+  padding: 0.75rem 1rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background-color 0.3s ease;
+}
+.btn-agregar:hover {
+  background-color: #0056b3;
+}
+.btn-agregar:disabled {
+  background-color: var(--color-secundario);
+  cursor: not-allowed;
+}

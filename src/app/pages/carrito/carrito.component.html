@@ -1,0 +1,47 @@
+<h2>Tu Carrito de Compras</h2>
+
+<div class="carrito-container" *ngIf="carrito$ | async as carrito; else loading">
+
+  <div *ngIf="!carrito.items || carrito.items.length === 0" class="carrito-vacio">
+    <p>Tu carrito está vacío.</p>
+    <a routerLink="/tienda" class="btn btn-primary">Ir a la Tienda</a>
+  </div>
+
+  <div *ngIf="carrito.items && carrito.items.length > 0" class="carrito-lleno">
+    <table>
+      <thead>
+        <tr>
+          <th>Producto</th>
+          <th>Precio</th>
+          <th>Cantidad</th>
+          <th>Subtotal</th>
+          <th>Quitar</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let item of carrito.items">
+          <td>{{ item.producto.nombre }}</td>
+          <td>{{ item.producto.precio | currency:'$' }}</td>
+          <td>
+            <input type="number" [value]="item.cantidad" min="1" 
+                   (change)="actualizarCantidad(item, $any($event.target).value)">
+          </td>
+          <td>{{ item.subtotal | currency:'$' }}</td>
+          <td>
+            <button (click)="eliminarItem(item.id)" class="btn-quitar">X</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="carrito-total">
+      <h3>Total: {{ calcularTotal(carrito.items) | currency:'$' }}</h3>
+      <a routerLink="/checkout" class="btn btn-primary">Proceder al Pago</a>
+    </div>
+  </div>
+
+</div>
+
+<ng-template #loading>
+  <p>Cargando carrito...</p>
+</ng-template>

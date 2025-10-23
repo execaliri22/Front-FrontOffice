@@ -1,0 +1,10 @@
+<div class="product-grid" *ngIf="productos$ | async as productos; else loading">
+  <app-product-card 
+    *ngFor="let producto of productos"
+    [producto]="producto">
+  </app-product-card>
+</div>
+
+<ng-template #loading>
+  <p>Cargando productos...</p>
+</ng-template>
