@@ -4,39 +4,35 @@
       <h4 class="filtro-titulo">Buscar</h4>
       <input type="text" placeholder="Buscar producto..." class="filtro-buscar">
     </div>
-
-    <!-- Sección de Categorías Actualizada -->
     <div class="filtro-seccion">
       <h4 class="filtro-titulo">Categorías</h4>
-      <!-- Muestra error si falla la carga de categorías -->
-      <p *ngIf="errorCategorias" class="error-msg">{{ errorCategorias }}</p>
-
-      <!-- Muestra las categorías si se cargan correctamente -->
-      <nav class="filtro-categorias" *ngIf="categorias$ | async as categorias">
-        <ul>
-          <!-- Botón "Todas" -->
-          <li>
-            <a (click)="seleccionarCategoria(null)"
-               [class.activo]="categoriaSeleccionadaId === null">
-              Todas
-            </a>
-          </li>
-          <!-- Itera sobre las categorías obtenidas -->
-          <li *ngFor="let cat of categorias">
-            <a (click)="seleccionarCategoria(cat.idCategoria)"
-               [class.activo]="categoriaSeleccionadaId === cat.idCategoria">
-              {{ cat.nombre }}
-            </a>
-          </li>
-        </ul>
-      </nav>
-      <!-- Indicador de carga para categorías -->
-      <p *ngIf="!(categorias$ | async) && !errorCategorias">Cargando categorías...</p>
+      @if (categorias$ | async; as categorias) {
+        <nav class="filtro-categorias">
+         <ul>
+            <li>
+              <a (click)="seleccionarCategoria(null)"
+                 [class.activo]="categoriaSeleccionadaId() === null">
+                Todas
+              </a>
+            </li>
+            @for (cat of categorias; track cat.idCategoria) {
+              <li>
+                <a (click)="seleccionarCategoria(cat.idCategoria)"
+                   [class.activo]="categoriaSeleccionadaId() === cat.idCategoria">
+                  {{ cat.nombre }}
+                </a>
+              </li>
+            }
+          </ul>
+        </nav>
+      } @else if (errorCategorias) {
+         <p class="error-msg">{{ errorCategorias }}</p>
+      } @else {
+        <p>Cargando categorías...</p>
+      }
     </div>
   </div>
 </aside>
-
 <section>
-  <!-- ProductListComponent ya obtiene los productos -->
-  <app-product-list></app-product-list>
+  <app-product-list [productos]="productos$ | async"></app-product-list>
 </section>

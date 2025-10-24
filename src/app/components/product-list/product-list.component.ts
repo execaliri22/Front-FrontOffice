@@ -1,29 +1,28 @@
-import { Component, OnInit } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Component, Input, ChangeDetectionStrategy } from '@angular/core'; // Añadir Input y ChangeDetectionStrategy
+// Quitar OnInit y Observable si ya no se usan para cargar aquí
 import { Producto } from '../../core/models/models';
-import { ProductoService } from '../../core/services/producto.service';
+// Quitar ProductoService si ya no se usa aquí
 
 // Importaciones Standalone
-import { CommonModule } from '@angular/common'; // Para *ngIf, *ngFor, | async
+import { CommonModule } from '@angular/common'; // Para @if, @for
 import { ProductCardComponent } from '../product-card/product-card.component';
 
 @Component({
   selector: 'app-product-list',
-  standalone: true, 
+  standalone: true,
   imports: [
     CommonModule,
-    ProductCardComponent // Importa el componente hijo
+    ProductCardComponent
   ],
   templateUrl: './product-list.component.html',
-  styleUrls: ['./product-list.component.css']
+  styleUrls: ['./product-list.component.css'],
+  changeDetection: ChangeDetectionStrategy.OnPush // Añadir OnPush
 })
-export class ProductListComponent implements OnInit {
-  
-  public productos$: Observable<Producto[]> | undefined;
+export class ProductListComponent { // Quitar OnInit si ya no se usa
 
-  constructor(private productoService: ProductoService) { }
+  // Input para recibir los productos del padre (TiendaComponent)
+  @Input() productos: Producto[] | null = null; // Acepta array o null
 
-  ngOnInit(): void {
-    this.productos$ = this.productoService.getProductos();
-  }
+  // Ya no necesita cargar productos aquí, los recibe del @Input
+  constructor() {} // Constructor vacío si no hay inyecciones
 }

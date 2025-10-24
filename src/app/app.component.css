@@ -54,12 +54,16 @@
 /* Footer */
 .footer {
   padding: 2.5rem 0; /* Más padding vertical */
-  background-color: #e9ecef; /* Un gris ligeramente más oscuro que el fondo base */
+  background-color: #505050; /* Un gris ligeramente más oscuro que el fondo base */
   border-top: 1px solid var(--color-borde);
   color: var(--color-texto-secundario);
   font-size: 0.9rem;
   margin-top: auto;
   width: 100%;
+}
+.footer p {
+  margin: 0;
+  color: white;
 }
 
 .footer .container {

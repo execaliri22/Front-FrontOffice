@@ -1,10 +1,15 @@
-<div class="product-grid" *ngIf="productos$ | async as productos; else loading">
-  <app-product-card 
-    *ngFor="let producto of productos"
-    [producto]="producto">
-  </app-product-card>
-</div>
-
-<ng-template #loading>
-  <p>Cargando productos...</p>
-</ng-template>
+<!-- Revisa si hay productos y si el array tiene elementos -->
+@if (productos && productos.length > 0) {
+  <div class="product-grid">
+    <!-- Itera sobre el array 'productos' -->
+    @for (producto of productos; track producto.idProducto) {
+      <app-product-card [producto]="producto"></app-product-card>
+    }
+  </div>
+} @else if (productos === null) {
+  <!-- Muestra mensaje de carga si productos es null -->
+  <p class="loading-message">Cargando productos...</p>
+} @else {
+  <!-- Muestra mensaje si no hay productos (array vacío) -->
+  <p class="loading-message">No se encontraron productos para esta categoría.</p>
+}

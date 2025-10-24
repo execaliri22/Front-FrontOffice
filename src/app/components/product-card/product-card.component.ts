@@ -35,8 +35,8 @@ export class ProductCardComponent {
     this.errorAgregar = null; // Resetea error
     console.log(`Agregando: ${this.producto.nombre}`);
 
-    this.carritoService.agregarItem(this.producto.idProducto, 1).subscribe({
-      next: (carritoActualizado) => {
+    this.carritoService.agregarItem(this.producto!.idProducto, 1).subscribe({
+      next: (_carritoActualizado) => {
         console.log(`${this.producto!.nombre} añadido al carrito.`);
         // Feedback visual: Podrías cambiar el texto del botón temporalmente,
         // mostrar un mensaje corto, etc. en lugar del alert.
