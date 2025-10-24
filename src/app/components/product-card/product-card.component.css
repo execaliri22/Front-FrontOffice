@@ -1,11 +1,11 @@
 
 .card {
 
-  background-color: var(--color-blanco);
+  background-color:rgba(103, 106, 142, 0.353);
 
   border-radius: 12px;
 
-  box-shadow: var(--sombra-delicada);
+  box-shadow: var(--sombra-fuerte);
 
   overflow: hidden;
 

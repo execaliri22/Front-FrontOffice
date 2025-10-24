@@ -9,9 +9,9 @@
 }
 
 .header-nav {
-  background-color: var(--color-blanco);
+  background-color: rgba(233, 233, 233, 0.907);
   /* Sombra más suave y extendida */
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04), 0 2px 8px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.377), 0 2px 8px rgba(0, 0, 0, 0.06);
   padding: 1rem 0; /* Mantenemos padding vertical */
   position: sticky;
   top: 0;
