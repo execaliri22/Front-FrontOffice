@@ -1,34 +1,168 @@
-:host { display: flex; flex-direction: column; min-height: 100vh; }
+/* --- src/app/app.component.css --- */
+
+/* Estructura Principal */
+:host {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background-color: var(--color-fondo); /* Asegura fondo si el contenido es corto */
+}
 
 .header-nav {
   background-color: var(--color-blanco);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-  padding: 0.8rem 0;
-  position: sticky; top: 0; z-index: 1000;
+  /* Sombra más suave y extendida */
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04), 0 2px 8px rgba(0, 0, 0, 0.06);
+  padding: 1rem 0; /* Mantenemos padding vertical */
+  position: sticky;
+  top: 0;
+  z-index: 1000;
   border-bottom: 1px solid var(--color-borde);
+  /* Transición para cualquier cambio futuro */
+  transition: background-color 0.3s ease;
 }
 
-.nav-container { display: flex; justify-content: space-between; align-items: center; }
-.nav-brand { font-size: 1.6rem; font-weight: 700; color: var(--color-texto-principal); letter-spacing: -0.5px; }
-.header-nav nav { display: flex; align-items: center; }
-.header-nav nav a {
-  margin-left: 1.8rem; font-weight: 500; color: var(--color-texto-secundario);
-  transition: color 0.2s ease; padding-bottom: 0.25rem;
-  border-bottom: 2px solid transparent; font-size: 0.95rem;
+/* Contenedor de Navegación */
+.nav-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  /* Aplica las propiedades del .container global */
+  max-width: var(--container-max-width, 1300px); /* Usa variable si la defines, sino default */
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
+  width: 100%;
+  box-sizing: border-box;
 }
-.header-nav nav a:hover, .header-nav nav a.active { color: var(--color-primario); border-bottom-color: var(--color-primario); }
-.nav-carrito { font-size: 1.6rem; margin-left: 1.8rem; color: var(--color-texto-secundario); transition: color 0.2s ease; }
-.nav-carrito:hover, .nav-carrito.active { color: var(--color-primario); }
 
-/* CLAVE: Asegura que el contenido principal use el padding definido en .container */
+/* Contenido Principal */
 .main-content {
-  padding-top: 2.5rem; /* Espacio arriba */
-  padding-bottom: 2.5rem; /* Espacio abajo */
-  flex-grow: 1; /* Empuja el footer hacia abajo */
+  padding-top: 3rem; /* Más espacio arriba */
+  padding-bottom: 3rem; /* Más espacio abajo */
+  flex-grow: 1;
+  /* Aplica las propiedades del .container global */
+  max-width: var(--container-max-width, 1300px);
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
+  width: 100%;
+  box-sizing: border-box;
 }
 
+/* Footer */
 .footer {
-  text-align: center; padding: 1.5rem 0; margin-top: 2.5rem;
-  background-color: var(--color-blanco); border-top: 1px solid var(--color-borde);
-  color: var(--color-texto-secundario); font-size: 0.9rem;
+  padding: 2.5rem 0; /* Más padding vertical */
+  background-color: #e9ecef; /* Un gris ligeramente más oscuro que el fondo base */
+  border-top: 1px solid var(--color-borde);
+  color: var(--color-texto-secundario);
+  font-size: 0.9rem;
+  margin-top: auto;
+  width: 100%;
+}
+
+.footer .container {
+  text-align: center;
+  /* Aplica las propiedades del .container global */
+  max-width: var(--container-max-width, 1300px);
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* --- Navegación --- */
+
+.nav-brand {
+  font-size: 1.6rem; /* Ligeramente más pequeño para balance */
+  font-weight: 700;
+  color: var(--color-texto-principal);
+  letter-spacing: -0.5px;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+.nav-brand:hover {
+  color: var(--color-primario);
+}
+
+.header-nav nav {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem; /* Un poco más de espacio entre ítems */
+}
+
+/* Enlaces base de navegación */
+.header-nav nav a {
+  padding: 0.5rem 1rem; /* Ajuste de padding */
+  font-weight: 500;
+  color: var(--color-texto-secundario);
+  text-decoration: none;
+  border-radius: 6px; /* Bordes un poco menos redondeados */
+  transition: background-color 0.2s ease, color 0.2s ease, transform 0.1s ease;
+  font-size: 0.95rem;
+  position: relative; /* Para posibles pseudo-elementos */
+  white-space: nowrap;
+}
+
+/* Efecto hover sutil */
+.header-nav nav a:not(.nav-cta):not(.nav-brand):hover {
+  background-color: rgba(0, 0, 0, 0.03); /* Fondo muy sutil */
+  color: var(--color-texto-principal);
+}
+
+/* Enlace activo */
+.header-nav nav a.active:not(.nav-cta) {
+  color: var(--color-primario);
+  font-weight: 600;
+  background-color: rgba(52, 152, 219, 0.08); /* Fondo con color primario muy transparente */
+}
+
+/* Efecto al presionar un enlace */
+.header-nav nav a:active {
+  transform: translateY(1px);
+}
+
+
+/* Botón CTA (Login/Logout) */
+.nav-cta {
+  background-color: var(--color-primario);
+  color: var(--color-blanco) !important;
+  font-weight: 500; /* Mismo peso que otros enlaces */
+  box-shadow: var(--sombra-boton);
+  /* Hereda padding, border-radius, font-size */
+}
+.nav-cta:hover {
+  background-color: #2980b9; /* Tono más oscuro */
+  color: var(--color-blanco) !important;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px); /* Efecto elevación */
+}
+.nav-cta:active {
+  transform: translateY(0px); /* Vuelve a posición normal al presionar */
+  box-shadow: var(--sombra-boton);
+}
+
+/* Carrito */
+.nav-carrito {
+  font-size: 70px; /* Ajusta tamaño del icono si es necesario */
+  padding: 0.4rem 0.6rem; /* Padding ajustado para icono */
+  line-height: 1;
+  display: flex; /* Ayuda a centrar el icono si es un SVG */
+  align-items: center;
+  justify-content: center;
+  margin-left: 0.5rem;
+}
+
+.nav-carrito .carrito-icon {
+  display: block;
+  transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); /* Transición con "rebote" */
+}
+.nav-carrito:hover .carrito-icon {
+  transform: scale(1.15); /* Escala más al pasar el ratón */
+}
+.nav-carrito:active .carrito-icon {
+    transform: scale(0.95); /* Encoge un poco al presionar */
 }

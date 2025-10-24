@@ -1,6 +1,36 @@
+/* --- src/app/components/product-list/product-list.component.css --- */
+
 .product-grid {
   display: grid;
-  /* Crea una cuadrícula responsive */
+  /* Columnas responsivas: se ajustan automáticamente llenando el espacio, 
+     con un mínimo de 280px y máximo de 1fr (fracción del espacio disponible) */
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 1.5rem;
+  gap: 2rem; /* Aumentamos un poco el espacio entre tarjetas */
+  padding: 1rem 0; /* Pequeño padding vertical si es necesario */
+}
+
+/* Estilo para el mensaje de carga */
+/* Buscamos el párrafo dentro del contenedor que usa la plantilla #loading */
+:host ::ng-deep .loading-message p, /* Para aplicarlo al <p> dentro de ng-template */
+:host p.loading-message /* O si decides ponerle una clase al <p> directamente */ {
+  text-align: center; /* Centra el texto */
+  padding: 3rem 1rem; /* Espaciado generoso */
+  font-size: 1.1rem; /* Tamaño de fuente ligeramente mayor */
+  color: var(--color-texto-secundario); /* Color de texto suave */
+  font-style: italic; /* Estilo cursiva */
+  min-height: 200px; /* Asegura un espacio mínimo mientras carga */
+  display: flex; /* Para centrar verticalmente si es necesario */
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+
+/* Si quieres añadir una animación sutil al cargar (opcional) */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.product-grid {
+  animation: fadeIn 0.5s ease-in-out; /* Aplica fade-in cuando aparecen los productos */
 }

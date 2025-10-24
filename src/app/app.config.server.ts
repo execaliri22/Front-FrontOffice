@@ -6,5 +6,6 @@ import { appConfig } from './app.config'; // Importa la config del cliente
 export const config: ApplicationConfig = mergeApplicationConfig(appConfig, {
   providers: [
     provideServerRendering() // Habilita el renderizado en servidor
+    // provideClientHydration() NO es necesario aquí, ya viene de appConfig
   ]
 });

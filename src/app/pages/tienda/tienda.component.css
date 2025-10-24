@@ -1,62 +1,124 @@
+/* --- src/app/pages/tienda/tienda.component.css --- */
+
 /* Contenedor principal de los filtros */
 .tienda-filtros {
   background-color: var(--color-blanco);
-  padding: 1.5rem 2rem;
+  padding: 2rem;
   border-radius: var(--borde-radio);
-  box-shadow: var(--sombra-suave);
-  margin-bottom: 2.5rem;
-  width: 100%; /* <<<<<< CLAVE: Ocupa todo el ancho del contenedor padre (.container) */
+  /* Sombra más intensa y definida */
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1), 0 2px 6px rgba(0, 0, 0, 0.07);
+  margin-bottom: 3rem;
+  width: 100%;
   box-sizing: border-box;
+  border: 1px solid var(--color-borde);
+  /* Opcional: Añadir una transición si planeas cambiar la sombra en hover */
+  /* transition: box-shadow 0.3s ease; */
 }
+
+/* Opcional: Si quieres que la sombra se intensifique al pasar el ratón */
+/*
+.tienda-filtros:hover {
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12), 0 4px 10px rgba(0, 0, 0, 0.08);
+  transform: translateY(-2px); // Ligero efecto de elevación
+}
+*/
 
 .filtros-wrapper {
   display: flex;
-  gap: 2.5rem;
+  gap: 3rem;
   align-items: flex-start;
   flex-wrap: wrap;
 }
 
 .filtro-seccion {
   flex: 1;
-  min-width: 250px;
+  min-width: 280px;
 }
 
+/* Título de cada sección de filtro */
 .filtro-titulo {
-  font-size: 1rem;
+  font-size: 0.9rem;
   font-weight: 600;
+  color: var(--color-texto-principal);
   margin-bottom: 1rem;
-  padding-bottom: 0.5rem;
+  padding-bottom: 0.6rem;
   border-bottom: 1px solid var(--color-borde);
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
 }
 
+/* Input de búsqueda */
 .filtro-buscar {
   width: 100%;
-  padding: 0.8rem 1rem;
+  padding: 0.9rem 1.2rem;
   border: 1px solid var(--color-borde);
-  border-radius: var(--borde-radio);
+  border-radius: 6px;
   font-size: 0.95rem;
   box-sizing: border-box;
+  background-color: #f8f9fa;
+  transition: all 0.2s ease;
+}
+.filtro-buscar::placeholder {
+  color: var(--color-texto-secundario);
+  opacity: 0.7;
 }
 .filtro-buscar:focus {
   outline: none;
   border-color: var(--color-primario);
-  box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
-}
-
-.filtro-categorias ul { list-style: none; padding: 0; margin: 0; display: flex; flex-wrap: wrap; gap: 0.8rem; }
-.filtro-categorias li a {
-  display: inline-block; padding: 0.5rem 1.2rem; color: var(--color-texto-secundario);
-  font-size: 0.9rem; cursor: pointer; border-radius: 20px;
-  border: 1px solid var(--color-borde); transition: all 0.2s ease;
+  box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.15);
   background-color: var(--color-blanco);
 }
-.filtro-categorias li a:hover, .filtro-categorias li a.activo {
-  color: var(--color-primario); background-color: rgba(52, 152, 219, 0.1);
-  border-color: var(--color-primario); font-weight: 500;
+
+/* Navegación de categorías */
+.filtro-categorias ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.8rem;
+}
+.filtro-categorias li a {
+  display: inline-block;
+  padding: 0.6rem 1.3rem;
+  color: var(--color-texto-secundario);
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  border-radius: 6px;
+  border: 1px solid transparent;
+  transition: all 0.2s ease;
+  background-color: var(--color-secundario);
+}
+.filtro-categorias li a:hover {
+  background-color: #e2e6ea;
+  color: var(--color-texto-principal);
+  transform: translateY(-1px);
+}
+.filtro-categorias li a.activo { /* Botón de categoría activa */
+  color: var(--color-blanco);
+  background-color: var(--color-primario);
+  border-color: var(--color-primario);
+  font-weight: 600;
+  box-shadow: 0 2px 5px rgba(52, 152, 219, 0.3);
+}
+
+/* Media Query para pantallas pequeñas */
+@media (max-width: 768px) {
+  .filtros-wrapper {
+     gap: 2rem;
+  }
 }
 
 @media (max-width: 600px) {
-  .filtros-wrapper { flex-direction: column; gap: 1.5rem; }
-  .filtro-seccion { min-width: 100%; }
-  .tienda-filtros { padding: 1rem 1.5rem; }
+  .filtros-wrapper {
+    flex-direction: column;
+    gap: 1.8rem;
+  }
+  .filtro-seccion {
+    min-width: 100%;
+  }
+  .tienda-filtros {
+    padding: 1.5rem;
+  }
 }

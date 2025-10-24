@@ -4,19 +4,25 @@
     <nav>
       <a routerLink="/tienda" routerLinkActive="active">Tienda</a>
       <a routerLink="/historial" routerLinkActive="active">Mis Pedidos</a>
-      <a *ngIf="!authService.isLoggedIn()" routerLink="/auth" routerLinkActive="active">Login</a>
-      <a *ngIf="authService.isLoggedIn()" (click)="authService.logout()" routerLink="/auth" style="cursor: pointer;">Logout</a>
+      
+      <a *ngIf="!authService.isLoggedIn()" routerLink="/auth" routerLinkActive="active" class="nav-cta">Login</a>
+      <a *ngIf="authService.isLoggedIn()" (click)="authService.logout()" routerLink="/auth" style="cursor: pointer;" class="nav-cta">Logout</a>
+      
       <a routerLink="/carrito" routerLinkActive="active" class="nav-carrito">
-        🛒
+        <span class="carrito-icon">🛒</span>
       </a>
     </nav>
   </div>
 </header>
 
-<main class="container main-content">
-  <router-outlet></router-outlet>
+<main>
+  <div class="container main-content">
+    <router-outlet></router-outlet>
+  </div>
 </main>
 
 <footer class="footer">
-  <p>&copy; 2025 B3D Casa Bureu Plásticos. Todos los derechos reservados.</p>
+  <div class="container">
+    <p>&copy; 2025 B3D Casa Bureu Plásticos. Todos los derechos reservados.</p>
+  </div>
 </footer>
