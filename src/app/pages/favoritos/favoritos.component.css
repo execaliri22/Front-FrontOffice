@@ -1,0 +1,39 @@
+h2 {
+  text-align: center;
+  margin-bottom: 2rem;
+  color: var(--color-texto-principal);
+}
+
+/* Reutiliza los estilos de product-list si son adecuados */
+.product-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 2rem;
+  padding: 1rem 0;
+}
+
+/* Estilos para el mensaje de "vacío" */
+.favoritos-vacio {
+  text-align: center;
+  padding: 3rem 1rem;
+  background-color: var(--color-blanco);
+  border-radius: var(--borde-radio);
+  box-shadow: var(--sombra-suave);
+  margin-top: 2rem;
+  border: 1px dashed var(--color-borde);
+}
+
+.favoritos-vacio p {
+  margin-bottom: 1.5rem;
+  color: var(--color-texto-secundario);
+  font-size: 1.1rem;
+}
+
+/* Estilo para mensaje de carga (similar a product-list) */
+.loading-message {
+  text-align: center;
+  padding: 3rem 1rem;
+  font-size: 1.1rem;
+  color: var(--color-texto-secundario);
+  font-style: italic;
+}

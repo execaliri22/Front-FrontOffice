@@ -1,0 +1,20 @@
+<h2>Mi Lista de Deseos ❤️</h2>
+
+@if (favoritos$ | async; as favoritos) {
+
+  @if (favoritos.length === 0) {
+    <div class="favoritos-vacio">
+      <p>Aún no has añadido ningún producto a tu lista de deseos.</p>
+      <a routerLink="/tienda" class="btn btn-primary">Explorar Tienda</a>
+    </div>
+  } @else {
+    <div class="product-grid">
+      @for (producto of favoritos; track producto.idProducto) {
+        <app-product-card [producto]="producto"></app-product-card>
+      }
+    </div>
+  }
+
+} @else {
+  <p class="loading-message">Cargando favoritos...</p>
+}

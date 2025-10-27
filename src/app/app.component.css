@@ -1,5 +1,3 @@
-/* --- src/app/app.component.css --- */
-
 /* Estructura Principal */
 :host {
   display: flex;
@@ -169,4 +167,134 @@
 }
 .nav-carrito:active .carrito-icon {
     transform: scale(0.95); /* Encoge un poco al presionar */
+}
+
+/* --- Estilos para el Menú de Perfil --- */
+
+.profile-section {
+  position: relative; /* Necesario para posicionar el menú de forma absoluta */
+  display: flex;
+  align-items: center;
+}
+
+.profile-trigger {
+  background-color: var(--color-primario);
+  color: var(--color-blanco);
+  border: none;
+  border-radius: 50%;
+  width: 40px; /* Ajusta el tamaño según necesites */
+  height: 40px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 0.5rem; /* Espacio antes del carrito */
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.profile-trigger:hover {
+  transform: scale(1.05);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.profile-menu {
+  position: absolute;
+  top: calc(100% + 10px); /* Posición debajo del botón + espacio */
+  right: 0;
+  background-color: var(--color-blanco);
+  border-radius: var(--borde-radio);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+  border: 1px solid var(--color-borde);
+  width: 250px; /* Ajusta el ancho según necesites */
+  z-index: 1010; /* Asegura que esté por encima de otros elementos */
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-10px);
+  transition: opacity 0.2s ease, visibility 0.2s ease, transform 0.2s ease;
+  overflow: hidden; /* Asegura que el contenido respete el borde redondeado */
+}
+
+/* Clase que se añade cuando el menú está visible */
+.profile-menu.show {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+/* Cabecera dentro del menú desplegable */
+.profile-menu-header {
+  padding: 1rem 1.25rem;
+  text-align: center;
+  border-bottom: 1px solid var(--color-borde);
+  background-color: #f8f9fa; /* Fondo claro para la cabecera */
+}
+
+/* Avatar dentro de la cabecera del menú */
+.profile-menu-avatar {
+   display: inline-block;
+   background-color: var(--color-primario); /* Mismo color que el botón */
+   color: var(--color-blanco);
+   border-radius: 50%;
+   width: 50px;
+   height: 50px;
+   line-height: 50px; /* Centra verticalmente las iniciales */
+   font-size: 1.2rem;
+   font-weight: 600;
+   margin-bottom: 0.75rem;
+}
+
+.profile-menu-header strong {
+  display: block;
+  font-size: 1rem;
+  color: var(--color-texto-principal);
+  margin-bottom: 0.25rem;
+  word-wrap: break-word; /* Para nombres largos */
+}
+
+.profile-menu-header small {
+  display: block;
+  font-size: 0.85rem;
+  color: var(--color-texto-secundario);
+  word-wrap: break-word; /* Para correos largos */
+}
+
+
+/* Lista de opciones del menú */
+.profile-menu ul {
+  list-style: none;
+  padding: 0.5rem 0; /* Padding arriba/abajo para la lista */
+  margin: 0;
+}
+
+.profile-menu li a {
+  display: flex; /* Usar flex para alinear icono y texto */
+  align-items: center;
+  gap: 0.75rem; /* Espacio entre icono y texto */
+  padding: 0.75rem 1.25rem; /* Padding para los items del menú */
+  color: var(--color-texto-principal);
+  text-decoration: none;
+  font-size: 0.9rem;
+  transition: background-color 0.15s ease, color 0.15s ease;
+  white-space: nowrap; /* Evita que el texto se parta en varias líneas */
+  overflow: hidden;
+  text-overflow: ellipsis; /* Añade puntos suspensivos si el texto es muy largo */
+}
+
+.profile-menu li a:hover {
+  background-color: var(--color-secundario);
+  color: var(--color-primario);
+}
+
+/* Separador horizontal */
+.profile-menu li hr {
+  border: none;
+  border-top: 1px solid var(--color-borde);
+  margin: 0.5rem 0;
+}
+
+/* Ajuste opcional del espacio en la barra de navegación si es necesario */
+.header-nav nav {
+  gap: 0.5rem; /* Reduce un poco el espacio si los elementos quedan muy juntos */
 }

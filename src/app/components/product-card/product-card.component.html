@@ -1,18 +1,34 @@
 <div class="card" *ngIf="producto">
-  
-  <span *ngIf="producto.stock < 10 && producto.stock > 0" class="card-stock-low">¡Últimos!</span>
-  <span *ngIf="producto.stock === 0" class="card-stock-out">Agotado</span>
 
+  <button
+    class="btn-favorito"
+    [class.es-favorito]="esFavorito()"
+    (click)="toggleFavorito()"
+    [disabled]="procesandoFavorito()" title="{{ esFavorito() ? 'Quitar de favoritos' : 'Añadir a favoritos' }}">
+    ❤️
+  </button>
+
+  <span *ngIf="producto.stock === 0" class="card-stock card-stock-out">Agotado</span>
+  <span *ngIf="producto.stock > 0 && producto.stock < 10" class="card-stock card-stock-low">¡Últimos!</span>
   <div class="card-imagen-container">
     <img [src]="producto.urlImagen" [alt]="producto.nombre" class="card-imagen">
   </div>
-  
+
   <div class="card-cuerpo">
     <h5 class="card-titulo">{{ producto.nombre }}</h5>
     <p class="card-precio">{{ producto.precio | currency:'$' }}</p>
-    
-    <button (click)="agregarAlCarrito()" class="btn-agregar" [disabled]="producto.stock === 0">
-      {{ producto.stock === 0 ? 'Agotado' : 'Añadir al Carrito' }}
+
+    <p class="stock-info">
+      Stock:
+      <span [class.stock-ok]="producto.stock > 0" [class.stock-agotado]="producto.stock === 0">
+        {{ producto.stock > 0 ? 'Disponible' : 'Agotado' }}
+      </span>
+      ({{ producto.stock }} unidades)
+    </p>
+
+    <button (click)="agregarAlCarrito()" class="btn-agregar" [disabled]="producto.stock === 0 || agregando()">
+      {{ agregando() ? 'Agregando...' : (producto.stock === 0 ? 'Agotado' : 'Añadir al Carrito') }}
     </button>
+     <p *ngIf="errorAgregar" class="error-agregar-msg">{{ errorAgregar }}</p>
   </div>
 </div>

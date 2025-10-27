@@ -1,9 +1,10 @@
-import { Component, Input, inject } from '@angular/core';
+import { Component, Input, inject, signal, computed, OnInit } from '@angular/core'; // Importar OnInit
 import { Producto } from '../../core/models/models';
 import { CarritoService } from '../../core/services/carrito.service';
 import { CommonModule } from '@angular/common';
-import { Router } from '@angular/router'; // Para redirigir si no está logueado
-import { AuthService } from '../../core/services/auth.service'; // Para chequear login
+import { Router } from '@angular/router';
+import { AuthService } from '../../core/services/auth.service';
+import { FavoritoService } from '../../core/services/favorito.service'; // <-- IMPORTAR FavoritoService
 
 @Component({
   selector: 'app-product-card',
@@ -11,48 +12,83 @@ import { AuthService } from '../../core/services/auth.service'; // Para chequear
   imports: [ CommonModule ],
   templateUrl: './product-card.component.html',
   styleUrls: ['./product-card.component.css']
+  // changeDetection: ChangeDetectionStrategy.OnPush // Puedes añadir OnPush si quieres optimizar
 })
-export class ProductCardComponent {
-  @Input() producto: Producto | undefined;
+export class ProductCardComponent implements OnInit { // Implementar OnInit
+  @Input({ required: true }) producto!: Producto; // Usar Input requerido
 
   private carritoService = inject(CarritoService);
-  private authService = inject(AuthService); // Inyecta AuthService
-  private router = inject(Router); // Inyecta Router
-  public agregando = false; // Estado para feedback visual (opcional)
-  public errorAgregar: string | null = null; // Para mostrar errores
+  private authService = inject(AuthService);
+  private router = inject(Router);
+  private favoritoService = inject(FavoritoService); // <-- Inyectar FavoritoService
+
+  public agregando = signal(false);
+  public errorAgregar: string | null = null;
+  public procesandoFavorito = signal(false); // Signal para feedback visual de favoritos
+
+  // Signal computado para saber si es favorito (lee del servicio)
+  public esFavorito = computed(() =>
+    this.producto ? this.favoritoService.esFavorito(this.producto.idProducto) : false
+  );
+
+  ngOnInit(): void {
+      // Puedes inicializar algo aquí si fuera necesario al recibir el Input producto
+      // console.log('ProductCard init:', this.producto?.nombre);
+  }
 
   agregarAlCarrito(): void {
-    if (!this.producto) return;
-
-    // Verifica si el usuario está logueado ANTES de llamar al servicio
     if (!this.authService.isLoggedIn()) {
       alert('Debes iniciar sesión para agregar productos al carrito.');
-      this.router.navigate(['/auth']); // Redirige a login
+      this.router.navigate(['/auth']);
       return;
     }
 
-    this.agregando = true; // Indica que se está procesando (para UI)
-    this.errorAgregar = null; // Resetea error
+    this.agregando.set(true);
+    this.errorAgregar = null;
     console.log(`Agregando: ${this.producto.nombre}`);
 
-    this.carritoService.agregarItem(this.producto!.idProducto, 1).subscribe({
+    this.carritoService.agregarItem(this.producto.idProducto, 1).subscribe({
       next: (_carritoActualizado) => {
-        console.log(`${this.producto!.nombre} añadido al carrito.`);
-        // Feedback visual: Podrías cambiar el texto del botón temporalmente,
-        // mostrar un mensaje corto, etc. en lugar del alert.
-        // Ejemplo simple: cambiar texto (requiere añadir variable al componente)
-        // this.textoBoton = '¡Añadido!';
-        // setTimeout(() => this.textoBoton = 'Añadir al Carrito', 1500);
-
-        this.agregando = false;
-        // alert(`${this.producto!.nombre} fue añadido al carrito.`); // QUITAMOS EL ALERT
+        console.log(`${this.producto.nombre} añadido al carrito.`);
+        this.agregando.set(false);
       },
       error: (err) => {
         console.error('Error al añadir producto:', err);
-        // Muestra el error específico del servicio
         this.errorAgregar = err.message || 'Error al añadir el producto.';
-        // alert(this.errorAgregar); // QUITAMOS EL ALERT
-        this.agregando = false;
+        this.agregando.set(false);
+      }
+    });
+  }
+
+  // Método ACTUALIZADO para manejar el clic en el botón de favoritos
+  toggleFavorito(): void {
+    if (!this.authService.isLoggedIn()) {
+      alert('Debes iniciar sesión para gestionar tus favoritos.');
+      this.router.navigate(['/auth']);
+      return;
+    }
+
+    this.procesandoFavorito.set(true); // Indica que se está procesando
+    const currentlyFavorite = this.esFavorito();
+    const productId = this.producto.idProducto;
+    const action = currentlyFavorite ? 'eliminar' : 'agregar';
+
+    const request$ = currentlyFavorite
+      ? this.favoritoService.eliminarFavorito(productId)
+      : this.favoritoService.agregarFavorito(productId);
+
+    request$.subscribe({
+      next: () => {
+        console.log(`Producto ${productId} ${currentlyFavorite ? 'eliminado de' : 'agregado a'} favoritos.`);
+        this.procesandoFavorito.set(false);
+        // El signal 'esFavorito' se actualizará automáticamente porque lee del servicio
+      },
+      error: (err) => {
+        console.error(`Error al ${action} favorito:`, err);
+        alert(`Error al ${action} favorito: ${err.message || 'Error desconocido'}`);
+        // No necesitamos revertir el estado aquí, ya que 'esFavorito' lee directamente del servicio,
+        // y el servicio no se actualizó debido al error.
+        this.procesandoFavorito.set(false);
       }
     });
   }

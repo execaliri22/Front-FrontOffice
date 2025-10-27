@@ -1,87 +1,153 @@
-import { Injectable, EventEmitter, OnDestroy } from '@angular/core'; // Añadir OnDestroy
+import { Injectable, computed, signal, OnDestroy, EventEmitter } from '@angular/core'; // Añadir signal y computed
 import { HttpClient } from '@angular/common/http';
-import { Observable, tap, BehaviorSubject, Subject, takeUntil } from 'rxjs'; // Añadir BehaviorSubject, Subject, takeUntil
+import { Observable, tap, Subject, takeUntil, catchError, throwError } from 'rxjs'; // Quitar BehaviorSubject si no se usa más directamente
 import { AuthResponse, LoginRequest, RegisterRequest } from '../models/models';
 
+// Interface simple para la estructura esperada del payload del JWT
+// Asegúrate que coincida con lo que envía tu backend (especialmente 'nombre')
+interface JwtPayload {
+  sub: string; // Típicamente el email/username
+  nombre?: string; // El backend DEBE incluir el nombre aquí para mostrarlo
+  exp?: number; // Fecha de expiración (opcional para mostrar)
+  iat?: number; // Fecha de emisión (opcional)
+  // Agrega otros campos si los necesitas/envías desde el backend
+}
+
 @Injectable({ providedIn: 'root' })
-export class AuthService implements OnDestroy { // Implementar OnDestroy
+export class AuthService implements OnDestroy {
   private apiUrl = '/auth';
   private readonly TOKEN_KEY = 'authToken';
-  public logoutEvent = new EventEmitter<void>(); // Puedes mantenerlo o eliminarlo si usas solo el BehaviorSubject
+  public logoutEvent = new EventEmitter<void>(); // Puedes mantenerlo si lo usas
 
-  // Subject para estado de login
-  private loggedInStatus = new BehaviorSubject<boolean>(this.hasToken());
-  public isLoggedIn$ = this.loggedInStatus.asObservable(); // Observable público del estado
+  // Signal para el estado de login
+  private loggedInStatus = signal<boolean>(false); // Inicializa en false, se actualiza en constructor
+  public isLoggedIn$ = this.loggedInStatus.asReadonly(); // Observable público (si lo necesitas)
 
-  // Subject para desuscripción
+  // Signals para el token y datos del usuario decodificados
+  private currentUserToken = signal<string | null>(null); // Inicializa en null
+  // Signal computado: decodifica el token cuando cambia
+  public currentUser = computed<JwtPayload | null>(() => {
+    const token = this.currentUserToken();
+    if (token) {
+      return this.decodeToken(token);
+    }
+    return null;
+  });
+  // Signals computados específicos para nombre y email (más fácil de usar en componentes)
+  public currentUserName = computed<string | null>(() => this.currentUser()?.nombre ?? this.currentUser()?.sub ?? null);
+  public currentUserEmail = computed<string | null>(() => this.currentUser()?.sub ?? null);
+
   private destroy$ = new Subject<void>();
 
   constructor(private http: HttpClient) {
-    // Opcional: Escuchar eventos de storage si el token puede cambiar en otra pestaña
-    // window.addEventListener('storage', this.handleStorageChange.bind(this));
+    // Solo actualiza el estado si estamos en el navegador
+    if (typeof localStorage !== 'undefined') {
+      this.updateLoginStatus(); // Actualiza estado al iniciar el servicio
+       window.addEventListener('storage', this.handleStorageChange.bind(this)); // Escucha cambios en otras pestañas
+    }
   }
 
-  ngOnDestroy(): void { // Método para limpiar
-      this.destroy$.next();
-      this.destroy$.complete();
-      // window.removeEventListener('storage', this.handleStorageChange.bind(this));
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+     if (typeof window !== 'undefined') { // Solo si estamos en el navegador
+        window.removeEventListener('storage', this.handleStorageChange.bind(this));
+     }
   }
 
-  // Método privado para verificar si hay token
+  // Verifica si hay token (solo en navegador)
   private hasToken(): boolean {
-    return !!localStorage.getItem(this.TOKEN_KEY);
+    return typeof localStorage !== 'undefined' && !!localStorage.getItem(this.TOKEN_KEY);
   }
 
-  // Método para actualizar el estado del BehaviorSubject
+  // Decodifica el payload del JWT (Implementación básica SIN verificar firma)
+  private decodeToken(token: string): JwtPayload | null {
+     // Solo decodifica si estamos en el navegador (atob no existe en SSR)
+     if (typeof atob === 'undefined') return null;
+    try {
+      // 1. Separa el token en sus partes (header, payload, signature)
+      const payloadBase64 = token.split('.')[1];
+      if (!payloadBase64) return null; // Si no hay payload, token inválido
+
+      // 2. Decodifica la parte del payload (Base64)
+      const payloadDecoded = atob(payloadBase64);
+
+      // 3. Parsea el JSON decodificado
+      return JSON.parse(payloadDecoded) as JwtPayload;
+    } catch (error) {
+      console.error('Error decodificando el token:', error);
+      this.clearToken(); // Limpia el token si es inválido
+      return null;
+    }
+  }
+
+  // Actualiza los signals basados en el localStorage (solo en navegador)
   private updateLoginStatus(): void {
-    this.loggedInStatus.next(this.hasToken());
+     if (typeof localStorage === 'undefined') return;
+    const token = localStorage.getItem(this.TOKEN_KEY);
+    this.currentUserToken.set(token); // Actualiza el signal del token
+    this.loggedInStatus.set(!!token); // Actualiza el signal de estado de login
+    console.log('Login status updated:', this.loggedInStatus());
   }
 
-  // POST /auth/register
+  // Limpia el token y actualiza signals (solo en navegador)
+  private clearToken(): void {
+     if (typeof localStorage === 'undefined') return;
+     localStorage.removeItem(this.TOKEN_KEY);
+     this.updateLoginStatus(); // Refleja el cambio en los signals
+  }
+
+  // Guarda el token y actualiza signals (solo en navegador)
+  private saveToken(token: string): void {
+     if (typeof localStorage === 'undefined') return;
+    localStorage.setItem(this.TOKEN_KEY, token);
+    this.updateLoginStatus(); // Refleja el cambio en los signals
+  }
+
+  // --- Métodos Públicos ---
+
   register(request: RegisterRequest): Observable<AuthResponse> {
     return this.http.post<AuthResponse>(`${this.apiUrl}/register`, request).pipe(
-      tap(response => {
-        this.saveToken(response.token);
-        this.updateLoginStatus(); // Actualiza el estado después de registrar
+      tap(response => this.saveToken(response.token)), // Guarda token y actualiza signals
+      catchError(err => {
+         console.error("Error en registro:", err);
+         return throwError(() => new Error('Error al registrar. ¿El email ya existe?')); // Mensaje de error más específico
       })
     );
   }
 
-  // POST /auth/login
   login(request: LoginRequest): Observable<AuthResponse> {
     return this.http.post<AuthResponse>(`${this.apiUrl}/login`, request).pipe(
-      tap(response => {
-        this.saveToken(response.token);
-        this.updateLoginStatus(); // Actualiza el estado después de login
+      tap(response => this.saveToken(response.token)), // Guarda token y actualiza signals
+      catchError(err => {
+         console.error("Error en login:", err);
+         return throwError(() => new Error('Email o contraseña incorrectos.')); // Mensaje de error más específico
       })
     );
   }
 
-  // (Diagrama: Cerrar sesión)
   logout(): void {
-    localStorage.removeItem(this.TOKEN_KEY);
-    this.updateLoginStatus(); // Actualiza el estado después de logout
-    this.logoutEvent.emit(); // Emite el evento si aún lo necesitas en otros lados
-  }
-
-  private saveToken(token: string): void {
-    localStorage.setItem(this.TOKEN_KEY, token);
+    this.clearToken(); // Limpia token y actualiza signals
+    this.logoutEvent.emit(); // Emite evento si es necesario
+    console.log('Usuario deslogueado.');
   }
 
   getToken(): string | null {
+     if (typeof localStorage === 'undefined') return null;
     return localStorage.getItem(this.TOKEN_KEY);
   }
 
-  // Método original, ahora puede usar el BehaviorSubject si prefieres
+  // Método público para verificar si está logueado (lee el signal)
   isLoggedIn(): boolean {
-    // return this.loggedInStatus.value; // O puedes leer el valor actual del Subject
-    return this.hasToken(); // O seguir usando la verificación directa
+    return this.loggedInStatus();
   }
 
-  // Opcional: Manejador para cambios en localStorage desde otras pestañas
-  // private handleStorageChange(event: StorageEvent): void {
-  //   if (event.key === this.TOKEN_KEY) {
-  //     this.updateLoginStatus();
-  //   }
-  // }
+  // Manejador para cambios en localStorage desde otras pestañas/ventanas
+  private handleStorageChange(event: StorageEvent): void {
+    // Si la clave que cambió es la del token, actualiza el estado
+    if (event.key === this.TOKEN_KEY) {
+      console.log('Storage change detectado para el token.');
+      this.updateLoginStatus();
+    }
+  }
 }
