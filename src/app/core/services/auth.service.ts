@@ -1,31 +1,33 @@
-import { Injectable, computed, signal, OnDestroy, EventEmitter } from '@angular/core'; // Añadir signal y computed
-import { HttpClient } from '@angular/common/http';
-import { Observable, tap, Subject, takeUntil, catchError, throwError } from 'rxjs'; // Quitar BehaviorSubject si no se usa más directamente
+import { Injectable, computed, signal, OnDestroy, EventEmitter, inject } from '@angular/core'; // inject añadido
+import { HttpClient, HttpErrorResponse } from '@angular/common/http'; // HttpErrorResponse añadido
+import { Observable, tap, Subject, catchError, throwError } from 'rxjs'; // takeUntil eliminado, catchError y throwError añadidos
 import { AuthResponse, LoginRequest, RegisterRequest } from '../models/models';
 
-// Interface simple para la estructura esperada del payload del JWT
-// Asegúrate que coincida con lo que envía tu backend (especialmente 'nombre')
+// Interface actualizada para el payload del JWT
 interface JwtPayload {
   sub: string; // Típicamente el email/username
-  nombre?: string; // El backend DEBE incluir el nombre aquí para mostrarlo
-  exp?: number; // Fecha de expiración (opcional para mostrar)
-  iat?: number; // Fecha de emisión (opcional)
-  // Agrega otros campos si los necesitas/envías desde el backend
+  nombre?: string; // Nombre del usuario
+  fotoPerfilUrl?: string; // <-- NUEVO CAMPO OPCIONAL
+  exp?: number;
+  iat?: number;
 }
 
 @Injectable({ providedIn: 'root' })
 export class AuthService implements OnDestroy {
-  private apiUrl = '/auth';
+  private apiUrl = '/auth'; // Ruta base para auth
+  private perfilApiUrl = '/api/perfil'; // Ruta base para perfil
   private readonly TOKEN_KEY = 'authToken';
-  public logoutEvent = new EventEmitter<void>(); // Puedes mantenerlo si lo usas
+  public logoutEvent = new EventEmitter<void>();
+
+  // Inyección de HttpClient
+  private http = inject(HttpClient);
 
   // Signal para el estado de login
-  private loggedInStatus = signal<boolean>(false); // Inicializa en false, se actualiza en constructor
-  public isLoggedIn$ = this.loggedInStatus.asReadonly(); // Observable público (si lo necesitas)
+  private loggedInStatus = signal<boolean>(false);
+  public isLoggedIn$ = this.loggedInStatus.asReadonly(); // No necesita ser observable si usas el signal directamente
 
   // Signals para el token y datos del usuario decodificados
-  private currentUserToken = signal<string | null>(null); // Inicializa en null
-  // Signal computado: decodifica el token cuando cambia
+  private currentUserToken = signal<string | null>(null);
   public currentUser = computed<JwtPayload | null>(() => {
     const token = this.currentUserToken();
     if (token) {
@@ -33,120 +35,187 @@ export class AuthService implements OnDestroy {
     }
     return null;
   });
-  // Signals computados específicos para nombre y email (más fácil de usar en componentes)
+  // Signals computados específicos (más fácil de usar)
   public currentUserName = computed<string | null>(() => this.currentUser()?.nombre ?? this.currentUser()?.sub ?? null);
   public currentUserEmail = computed<string | null>(() => this.currentUser()?.sub ?? null);
+  public currentUserFotoUrl = computed<string | null>(() => this.currentUser()?.fotoPerfilUrl ?? null); // <-- NUEVO SIGNAL COMPUTADO
 
   private destroy$ = new Subject<void>();
 
-  constructor(private http: HttpClient) {
+  constructor() {
     // Solo actualiza el estado si estamos en el navegador
     if (typeof localStorage !== 'undefined') {
-      this.updateLoginStatus(); // Actualiza estado al iniciar el servicio
-       window.addEventListener('storage', this.handleStorageChange.bind(this)); // Escucha cambios en otras pestañas
+      this.updateLoginStatus(); // Actualiza estado al iniciar
+      window.addEventListener('storage', this.handleStorageChange.bind(this)); // Escucha cambios
     }
   }
 
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
-     if (typeof window !== 'undefined') { // Solo si estamos en el navegador
-        window.removeEventListener('storage', this.handleStorageChange.bind(this));
-     }
-  }
-
-  // Verifica si hay token (solo en navegador)
-  private hasToken(): boolean {
-    return typeof localStorage !== 'undefined' && !!localStorage.getItem(this.TOKEN_KEY);
-  }
-
-  // Decodifica el payload del JWT (Implementación básica SIN verificar firma)
-  private decodeToken(token: string): JwtPayload | null {
-     // Solo decodifica si estamos en el navegador (atob no existe en SSR)
-     if (typeof atob === 'undefined') return null;
-    try {
-      // 1. Separa el token en sus partes (header, payload, signature)
-      const payloadBase64 = token.split('.')[1];
-      if (!payloadBase64) return null; // Si no hay payload, token inválido
-
-      // 2. Decodifica la parte del payload (Base64)
-      const payloadDecoded = atob(payloadBase64);
-
-      // 3. Parsea el JSON decodificado
-      return JSON.parse(payloadDecoded) as JwtPayload;
-    } catch (error) {
-      console.error('Error decodificando el token:', error);
-      this.clearToken(); // Limpia el token si es inválido
-      return null;
+    if (typeof window !== 'undefined') {
+       window.removeEventListener('storage', this.handleStorageChange.bind(this));
     }
   }
 
-  // Actualiza los signals basados en el localStorage (solo en navegador)
-  private updateLoginStatus(): void {
-     if (typeof localStorage === 'undefined') return;
-    const token = localStorage.getItem(this.TOKEN_KEY);
-    this.currentUserToken.set(token); // Actualiza el signal del token
-    this.loggedInStatus.set(!!token); // Actualiza el signal de estado de login
-    console.log('Login status updated:', this.loggedInStatus());
+  // Decodifica el payload del JWT
+  private decodeToken(token: string): JwtPayload | null {
+     if (typeof atob === 'undefined') return null;
+     try {
+       const payloadBase64 = token.split('.')[1];
+       if (!payloadBase64) return null;
+       const payloadDecoded = atob(payloadBase64);
+       const payload = JSON.parse(payloadDecoded) as JwtPayload;
+       console.log("Decoded Payload:", payload); // Para depurar
+       return payload;
+     } catch (error) {
+       console.error('Error decodificando el token:', error);
+       this.clearToken(); // Limpia token inválido
+       return null;
+     }
   }
 
-  // Limpia el token y actualiza signals (solo en navegador)
+  // Actualiza los signals basados en localStorage
+  private updateLoginStatus(): void {
+     if (typeof localStorage === 'undefined') return;
+     const token = localStorage.getItem(this.TOKEN_KEY);
+     this.currentUserToken.set(token);
+     this.loggedInStatus.set(!!token);
+     console.log('AuthService: Login status updated:', this.loggedInStatus());
+     console.log('AuthService: Current user data:', this.currentUser()); // Log para depurar datos decodificados
+  }
+
+  // Limpia el token y actualiza signals
   private clearToken(): void {
      if (typeof localStorage === 'undefined') return;
      localStorage.removeItem(this.TOKEN_KEY);
-     this.updateLoginStatus(); // Refleja el cambio en los signals
+     this.updateLoginStatus();
   }
 
-  // Guarda el token y actualiza signals (solo en navegador)
+  // Guarda el token y actualiza signals
   private saveToken(token: string): void {
      if (typeof localStorage === 'undefined') return;
-    localStorage.setItem(this.TOKEN_KEY, token);
-    this.updateLoginStatus(); // Refleja el cambio en los signals
+     localStorage.setItem(this.TOKEN_KEY, token);
+     this.updateLoginStatus();
   }
 
-  // --- Métodos Públicos ---
+  // --- Métodos de Autenticación ---
 
   register(request: RegisterRequest): Observable<AuthResponse> {
     return this.http.post<AuthResponse>(`${this.apiUrl}/register`, request).pipe(
-      tap(response => this.saveToken(response.token)), // Guarda token y actualiza signals
-      catchError(err => {
-         console.error("Error en registro:", err);
-         return throwError(() => new Error('Error al registrar. ¿El email ya existe?')); // Mensaje de error más específico
-      })
+      tap(response => this.saveToken(response.token)),
+      catchError(err => this.handleError(err, 'registro')) // Usa manejador de errores
     );
   }
 
   login(request: LoginRequest): Observable<AuthResponse> {
     return this.http.post<AuthResponse>(`${this.apiUrl}/login`, request).pipe(
-      tap(response => this.saveToken(response.token)), // Guarda token y actualiza signals
-      catchError(err => {
-         console.error("Error en login:", err);
-         return throwError(() => new Error('Email o contraseña incorrectos.')); // Mensaje de error más específico
-      })
+      tap(response => this.saveToken(response.token)),
+      catchError(err => this.handleError(err, 'login')) // Usa manejador de errores
     );
   }
 
   logout(): void {
-    this.clearToken(); // Limpia token y actualiza signals
-    this.logoutEvent.emit(); // Emite evento si es necesario
+    this.clearToken();
+    this.logoutEvent.emit();
     console.log('Usuario deslogueado.');
   }
 
   getToken(): string | null {
      if (typeof localStorage === 'undefined') return null;
-    return localStorage.getItem(this.TOKEN_KEY);
+     return localStorage.getItem(this.TOKEN_KEY);
   }
 
-  // Método público para verificar si está logueado (lee el signal)
   isLoggedIn(): boolean {
     return this.loggedInStatus();
   }
 
-  // Manejador para cambios en localStorage desde otras pestañas/ventanas
+  // --- Métodos de Perfil ---
+
+  // Refresca los datos del usuario localmente a partir de un nuevo token
+  // Útil después de actualizar el perfil si el backend devuelve el token actualizado
+  private refreshUserDataFromToken(newToken: string): void {
+      console.log("Refrescando datos del usuario con nuevo token...");
+      this.saveToken(newToken); // Esto guarda Y actualiza los signals
+  }
+
+  actualizarNombre(nuevoNombre: string): Observable<AuthResponse> { // Espera AuthResponse con el nuevo token
+    return this.http.put<AuthResponse>(`${this.perfilApiUrl}/nombre`, { nombre: nuevoNombre }).pipe(
+       tap(response => this.refreshUserDataFromToken(response.token)), // Refresca con el nuevo token
+       catchError(err => this.handleError(err, 'actualizar nombre'))
+    );
+  }
+
+  // ***** CAMBIO AQUÍ *****
+  cambiarContrasena(actual: string, nueva: string): Observable<string> { // Cambiado a Observable<string>
+     // Añadido { responseType: 'text' }
+     return this.http.put(`${this.perfilApiUrl}/contrasena`, { actual, nueva }, { responseType: 'text' }).pipe(
+        tap(responseText => console.log('Respuesta del backend (cambio contraseña):', responseText)), // Opcional: loguear la respuesta de texto
+        catchError(err => this.handleError(err, 'cambiar contraseña'))
+     );
+  }
+  // ***** FIN DEL CAMBIO *****
+
+  subirFotoPerfil(archivo: File): Observable<AuthResponse> { // Espera AuthResponse con el nuevo token
+     const formData = new FormData();
+     formData.append('file', archivo, archivo.name); // 'file' coincide con @RequestParam("file")
+     return this.http.post<AuthResponse>(`${this.perfilApiUrl}/foto`, formData).pipe(
+        tap(response => this.refreshUserDataFromToken(response.token)), // Refresca con el nuevo token
+        catchError(err => this.handleError(err, 'subir foto'))
+     );
+  }
+
+  eliminarFotoPerfil(): Observable<AuthResponse> { // Espera AuthResponse con el nuevo token (sin fotoUrl)
+     return this.http.delete<AuthResponse>(`${this.perfilApiUrl}/foto`).pipe(
+        tap(response => this.refreshUserDataFromToken(response.token)), // Refresca con el nuevo token
+        catchError(err => this.handleError(err, 'eliminar foto'))
+     );
+  }
+
+
+  // Manejador de errores centralizado
+  private handleError(error: HttpErrorResponse, context: string = 'desconocido'): Observable<never> {
+    console.error(`Error en ${context}:`, error); // Log original del error para depuración interna
+    let userMessage = `Ocurrió un error en la operación (${context}). Intenta de nuevo.`; // Mensaje genérico por defecto
+
+    if (error.status === 0) {
+        // Error de conexión (el servidor no responde o problema de red)
+        userMessage = 'No se pudo conectar con el servidor. Verifica tu conexión e intenta de nuevo.';
+    } else if (error.status === 401 || error.status === 403) {
+      // Errores de autenticación/autorización
+      userMessage = 'Tu sesión ha expirado o no tienes permiso. Por favor, inicia sesión de nuevo.';
+      // Considera desloguear al usuario aquí si quieres forzar un nuevo login
+      // this.logout();
+    } else if (error.status === 404) {
+      // Recurso no encontrado
+      userMessage = 'El recurso solicitado no fue encontrado en el servidor.';
+    } else if (error.status === 400) {
+        // Errores del lado del cliente enviados por el backend (ej. validación, contraseña incorrecta)
+        if (typeof error.error === 'string' && error.error.length < 100) { // Si es un string simple
+            userMessage = error.error; // Mostrar directamente el mensaje del backend
+        } else if (error.error && typeof error.error.message === 'string') { // Si es un objeto JSON con propiedad 'message'
+             userMessage = error.error.message;
+        } else {
+             // Mensaje genérico para 400 si el formato no es esperado
+            userMessage = `Datos inválidos (${context}). Verifica la información ingresada.`;
+        }
+    } else if (error.status >= 500) {
+      // Errores internos del servidor
+      userMessage = 'Ocurrió un error inesperado en el servidor. Por favor, intenta más tarde.';
+    }
+    // else { // Otros códigos de error (4xx no cubiertos antes, etc.)
+    //    userMessage = `Error ${error.status}: ${error.statusText}. Intenta de nuevo.`;
+    // }
+
+    // Devuelve un observable que emite un *nuevo* Error con el mensaje amigable
+    return throwError(() => new Error(userMessage));
+  }
+
+
+  // Manejador para cambios en localStorage
   private handleStorageChange(event: StorageEvent): void {
-    // Si la clave que cambió es la del token, actualiza el estado
     if (event.key === this.TOKEN_KEY) {
-      console.log('Storage change detectado para el token.');
+      console.log('AuthService: Storage change detectado para el token.');
       this.updateLoginStatus();
     }
   }

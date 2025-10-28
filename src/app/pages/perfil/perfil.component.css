@@ -1,0 +1,125 @@
+/* Contenedor principal del perfil */
+.perfil-container {
+  display: grid;
+  grid-template-columns: 1fr; /* Una columna por defecto */
+  gap: 2rem;
+  max-width: 900px; /* Ancho máximo */
+  margin: 2rem auto; /* Centrado */
+}
+
+/* Estilo base para las tarjetas de sección */
+.card {
+  background-color: var(--color-blanco);
+  padding: 2rem;
+  border-radius: var(--borde-radio);
+  box-shadow: var(--sombra-suave);
+  border: 1px solid var(--color-borde);
+}
+
+.card h3 {
+  margin-bottom: 1.5rem;
+  color: var(--color-texto-principal);
+  border-bottom: 1px solid var(--color-borde);
+  padding-bottom: 0.75rem;
+}
+
+/* Sección de la foto */
+.foto-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.foto-display {
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  overflow: hidden;
+  margin-bottom: 1.5rem;
+  background-color: var(--color-secundario); /* Fondo para placeholder */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 3px solid var(--color-blanco);
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.profile-pic {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* Asegura que la imagen cubra el círculo */
+  display: block;
+}
+
+.profile-pic.placeholder span {
+  font-size: 3rem;
+  font-weight: 600;
+  color: var(--color-texto-secundario);
+}
+
+.foto-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.foto-actions .btn {
+  padding: 0.6rem 1.2rem;
+  font-size: 0.9rem;
+}
+
+/* Sección de datos */
+.datos-section form {
+  margin-bottom: 1.5rem;
+}
+
+.datos-section form:last-child {
+  margin-bottom: 0;
+}
+
+.separator {
+  border: none;
+  border-top: 1px solid var(--color-borde);
+  margin: 2rem 0;
+}
+
+/* Mensajes de error y éxito */
+.error-msg {
+  color: var(--color-peligro);
+  font-size: 0.85rem;
+  margin-top: 0.5rem;
+  text-align: left; /* Alinea con el input */
+}
+.text-danger { /* Para errores inline */
+   color: var(--color-peligro);
+   font-size: 0.8rem;
+   display: block;
+   margin-top: 0.25rem;
+}
+
+.success-msg {
+  color: #2ecc71; /* Verde éxito */
+  font-size: 0.9rem;
+  margin-top: 0.75rem;
+  font-weight: 500;
+}
+
+.success-msg.global-message {
+  text-align: center;
+  padding: 1rem;
+  background-color: #e8f8f0; /* Fondo verde claro */
+  border: 1px solid #a2e4c0;
+  border-radius: var(--borde-radio);
+  margin-top: 1.5rem;
+  color: #1a6f43; /* Texto verde oscuro */
+}
+
+
+/* Responsividad */
+@media (min-width: 768px) {
+  .perfil-container {
+    grid-template-columns: 300px 1fr; /* Columna para foto, resto para datos */
+    align-items: flex-start; /* Alinea las tarjetas arriba */
+  }
+}

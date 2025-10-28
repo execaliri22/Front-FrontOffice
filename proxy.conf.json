@@ -15,8 +15,19 @@
     "target": "http://localhost:8080",
     "secure": false
   },
-  "/favoritos": { 
+  "/favoritos": {
     "target": "http://localhost:8080",
     "secure": false
+  },
+  "/api/perfil": {  
+    "target": "http://localhost:8080",
+    "secure": false
+  },
+  "/uploads/perfil": { 
+    "target": "http://localhost:8080",
+    "secure": false,
+    "pathRewrite": {
+       "^/uploads/perfil": "/uploads/perfil" 
+     }
   }
 }

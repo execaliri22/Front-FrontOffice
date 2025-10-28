@@ -3,21 +3,39 @@
     <a routerLink="/" class="nav-brand">B3D Plásticos</a>
     <nav>
       <a routerLink="/tienda" routerLinkActive="active">Tienda</a>
-
       @if (authService.isLoggedIn()) {
         <a routerLink="/historial" routerLinkActive="active">Mis Pedidos</a>
       }
 
+      <a routerLink="/carrito" routerLinkActive="active" class="nav-carrito">
+        <span class="carrito-icon">🛒</span>
+      </a>
+
       <div class="profile-section">
-        @if (authService.isLoggedIn()) { <button class="profile-trigger" (click)="toggleMenu()">
-             <span>{{ getUserInitials() }}</span> </button>
+        @if (authService.isLoggedIn()) {
+          <button class="profile-trigger" (click)="toggleMenu()">
+            @if (authService.currentUserFotoUrl()) {
+              <img [src]="authService.currentUserFotoUrl()" alt="Foto de perfil" class="profile-trigger-img">
+            } @else {
+              <span>{{ getUserInitials() }}</span>
+            }
+          </button>
 
           <div class="profile-menu" [class.show]="menuVisible()">
              <div class="profile-menu-header">
-                <span class="profile-menu-avatar">{{ getUserInitials() }}</span> <strong>{{ authService.currentUserName() || 'Usuario' }}</strong> <small>{{ authService.currentUserEmail() || 'email@ejemplo.com' }}</small> </div>
+                @if (authService.currentUserFotoUrl()) {
+                  <img [src]="authService.currentUserFotoUrl()" alt="Foto de perfil" class="profile-menu-img">
+                } @else {
+                  <span class="profile-menu-avatar">{{ getUserInitials() }}</span>
+                }
+                <strong>{{ authService.currentUserName() || 'Usuario' }}</strong>
+                <small>{{ authService.currentUserEmail() || 'email@ejemplo.com' }}</small>
+             </div>
              <ul>
-               <li><a routerLink="/perfil">👤 Mi perfil</a></li> <li><a routerLink="/historial">🛍️ Mis pedidos</a></li>
-               <li><a routerLink="/favoritos">❤️ Favoritos</a></li> <li><hr></li>
+               <li><a routerLink="/perfil" (click)="menuVisible.set(false)">👤 Mi perfil</a></li>
+               <li><a routerLink="/historial" (click)="menuVisible.set(false)">🛍️ Mis pedidos</a></li>
+               <li><a routerLink="/favoritos" (click)="menuVisible.set(false)">❤️ Favoritos</a></li>
+               <li><hr></li>
                <li><a (click)="logout()" style="cursor: pointer;">↪️ Cerrar sesión</a></li>
              </ul>
           </div>
@@ -26,9 +44,6 @@
         }
       </div>
 
-      <a routerLink="/carrito" routerLinkActive="active" class="nav-carrito">
-        <span class="carrito-icon">🛒</span>
-      </a>
     </nav>
   </div>
 </header>

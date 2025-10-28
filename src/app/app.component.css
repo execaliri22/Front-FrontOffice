@@ -149,7 +149,10 @@
 
 /* Carrito */
 .nav-carrito {
-  font-size: 70px; /* Ajusta tamaño del icono si es necesario */
+  /* Ajusta este valor al tamaño deseado */
+  /* Prueba con valores como 1.5rem, 1.8rem, 24px, 28px, etc. */
+  font-size: 60px; /* <-- CAMBIA ESTE VALOR (ej. 1.8rem o 28px) */
+
   padding: 0.4rem 0.6rem; /* Padding ajustado para icono */
   line-height: 1;
   display: flex; /* Ayuda a centrar el icono si es un SVG */
@@ -157,6 +160,8 @@
   justify-content: center;
   margin-left: 0.5rem;
 }
+
+/* ... (el resto de las reglas .nav-carrito .carrito-icon, etc., pueden quedar igual) ... */
 
 .nav-carrito .carrito-icon {
   display: block;
@@ -166,7 +171,7 @@
   transform: scale(1.15); /* Escala más al pasar el ratón */
 }
 .nav-carrito:active .carrito-icon {
-    transform: scale(0.95); /* Encoge un poco al presionar */
+    transform: scale(1.00); /* Encoge un poco al presionar */
 }
 
 /* --- Estilos para el Menú de Perfil --- */
@@ -297,4 +302,160 @@
 /* Ajuste opcional del espacio en la barra de navegación si es necesario */
 .header-nav nav {
   gap: 0.5rem; /* Reduce un poco el espacio si los elementos quedan muy juntos */
+}
+
+
+.profile-section {
+  position: relative; /* Necesario para posicionar el menú de forma absoluta */
+  display: flex;
+  align-items: center;
+}
+
+.profile-trigger {
+  background-color: var(--color-primario);
+  color: var(--color-blanco);
+  border: none;
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 0.5rem;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  overflow: hidden; /* Para contener la imagen */
+  padding: 0; /* Asegura que no haya padding extra */
+}
+
+/* NUEVO: Estilo para la imagen dentro del botón trigger */
+.profile-trigger-img {
+  
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* Asegura que la imagen cubra el círculo */
+  display: block;
+  
+}
+
+
+.profile-trigger:hover {
+  transform: scale(1.05);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.profile-menu {
+  position: absolute;
+  top: calc(100% + 10px); /* Posición debajo del botón + espacio */
+  right: 0;
+  background-color: var(--color-blanco);
+  border-radius: var(--borde-radio);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+  border: 1px solid var(--color-borde);
+  width: 250px;
+  z-index: 1010;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-10px);
+  transition: opacity 0.2s ease, visibility 0.2s ease, transform 0.2s ease;
+  overflow: hidden;
+}
+
+.profile-menu.show {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.profile-menu-header {
+  padding: 1rem 1.25rem;
+  text-align: center;
+  border-bottom: 1px solid var(--color-borde);
+  background-color: #f8f9fa;
+}
+
+/* Modificado para avatar o imagen */
+.profile-menu-avatar, .profile-menu-img {
+   display: inline-block;
+   border-radius: 50%;
+   width: 50px;
+   height: 50px;
+   margin-bottom: 0.75rem;
+}
+
+.profile-menu-avatar {
+   background-color: var(--color-primario);
+   color: var(--color-blanco);
+   line-height: 50px;
+   font-size: 1.2rem;
+   font-weight: 600;
+   text-align: center; /* Centra las iniciales */
+}
+
+/* NUEVO: Estilo para la imagen dentro del menú */
+.profile-menu-img {
+    object-fit: cover;
+    border: 2px solid var(--color-blanco); /* Opcional: borde blanco */
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+
+
+    display: inline-block;
+   border-radius: 50%;
+   width: 150px;  /* <-- Aumenta este valor */
+   height: 150px; /* <-- Aumenta este valor */
+   margin-bottom: 0.75rem;
+}
+
+.profile-menu-header strong {
+  display: block;
+  font-size: 1rem;
+  color: var(--color-texto-principal);
+  margin-bottom: 0.25rem;
+  word-wrap: break-word;
+}
+
+.profile-menu-header small {
+  display: block;
+  font-size: 0.85rem;
+  color: var(--color-texto-secundario);
+  word-wrap: break-word;
+}
+
+
+.profile-menu ul {
+  list-style: none;
+  padding: 0.5rem 0;
+  margin: 0;
+}
+
+.profile-menu li a {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1.25rem;
+  color: var(--color-texto-principal);
+  text-decoration: none;
+  font-size: 0.9rem;
+  transition: background-color 0.15s ease, color 0.15s ease;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.profile-menu li a:hover {
+  background-color: #e9ecef; /* Un gris un poco más oscuro que --color-secundario */
+  color: var(--color-primario);
+}
+
+.profile-menu li hr {
+  border: none;
+  border-top: 1px solid var(--color-borde);
+  margin: 0.5rem 0;
+}
+
+/* Ajuste opcional del espacio en la barra de navegación si es necesario */
+.header-nav nav {
+  gap: 0.5rem;
 }
